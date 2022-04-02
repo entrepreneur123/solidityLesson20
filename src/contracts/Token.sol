@@ -24,8 +24,14 @@ contract Token {
     //we can track the balances like this 
     mapping(address => uint256) public balanceOf; //this will do two thing ,first 
     //it will create state variable and also expose balanceOF function
+
+    mapping(address => mapping(address => uint256)) public allowance;
+    //this is where to keep track of exchange allows us to send
+    //first address is gonna be the address of aa person approve the tokens and 2nd mapping(addess=>uint256 )is gonna be all of 
+    //the places where they approve the token.this gonna be multiple exchanges.
     //Events
     event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner,address indexed spender,uint256 value);
     
     //inorder to track balance , we need to store the balances=> state
     
@@ -42,12 +48,30 @@ contract Token {
 
     //send tokens
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        require(_to !=address(0));
-        require(balanceOf[msg.sender]>= _value);
-        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
-        balanceOf[_to] = balanceOf[_to].add(_value);
-        emit Transfer(msg.sender, _to, _value);
+        require(balanceOf[msg.sender] >= _value);
+        _transfer(msg.sender, _to, _value);
+        
         return true;
 
     }
+
+    function _transfer(address _to,uint256 _value) internal {
+        require(_to !=address(0));
+        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
+        balanceOf[_to] = balanceOf[_to].add(_value);
+        emit Transfer(msg.sender, _to, _value);
+    }
+
+    //Approve token
+    function approve(address _spender,uint256 _value) public returns (bool success){
+        require(_spender != address(0));
+        allowance[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
+        return true;
+    }
+    //transfer from
+
+function transferFrom(address _from, address _to, uint256 _value) public returns (bool success){
+    return true;
+}
 }
